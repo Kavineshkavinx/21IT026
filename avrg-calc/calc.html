@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Average Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f9f9f9, #f0f0f0);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555555;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0 20px;
+            border: none;
+            border-radius: 10px;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+            color: #333333;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Average Calculator</h1>
+    <form id="averageForm">
+        <label for="sequenceType">Select sequence type:</label><br>
+        <select id="sequenceType">
+            <option value="p">Prime</option>
+            <option value="f">Fibonacci</option>
+            <option value="r">Random</option>
+        </select><br><br>
+        <button type="button" onclick="calculateAverage()">Calculate Average</button>
+    </form>
+    <p id="result"></p>
+</div>
+
+<script>
+    var data = {
+        "windowPrevState": [],
+        "windowCurState": [1, 3, 5, 7],
+        "numbers": [1, 3, 5, 7],
+        "avg": 4.00
+    };
+
+    function calculateAverage() {
+        var sequenceType = document.getElementById('sequenceType').value;
+
+        fetch('https://api.example.com/getnumbers?type=' + sequenceType)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch numbers');
+                }
+                return response.json();
+            })
+            .then(newData => {
+                data.windowPrevState = data.windowCurState.slice();
+
+                data.windowCurState = newData.numbers;
+
+                data.numbers = newData.numbers;
+
+                var sum = data.numbers.reduce((acc, val) => acc + val, 0);
+                data.avg = (sum / data.numbers.length).toFixed(2);
+
+                displayResult();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'Error occurred while fetching numbers. Please try again.';
+            });
+    }
+
+    function displayResult() {
+        document.getElementById('result').innerText = 'Previous window state: ' + data.windowPrevState.join(', ') + '\n' +
+            'Current window state: ' + data.windowCurState.join(', ') + '\n' +
+            'Numbers: ' + data.numbers.join(', ') + '\n' +
+            'Average: ' + data.avg;
+    }
+</script>
+</body>
+</html>
